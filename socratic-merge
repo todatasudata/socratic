@@ -3,6 +3,9 @@
 socratic-merge reads docs/socratic.md and distributes tagged discoveries
 into docs/<category>/index.md files in the current repository.
 
+Valid category tags come from the existing docs/ folder structure.
+Each immediate subdirectory under docs/ is a valid category.
+
 Expected socratic.md format:
 
 ## <Topic>
@@ -20,98 +23,49 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-
-CATEGORIES = {
-    "architecture": [
-        "архитектура",
-        "компонент",
-        "стек",
-        "data flow",
-        "микросервис",
-        "монолит",
-        "service",
-        "module",
-    ],
-    "api": [
-        "api",
-        "endpoint",
-        "контракт",
-        "интеграция",
-        "webhook",
-        "rest",
-        "graphql",
-    ],
-    "data": [
-        "база данных",
-        "модель данных",
-        "миграция",
-        "хранение",
-        "backup",
-        "state",
-        "schema",
-    ],
-    "deployment": [
-        "deploy",
-        "infra",
-        "инфраструктура",
-        "ci/cd",
-        "docker",
-        "kubernetes",
-        "hosting",
-        "server",
-    ],
-    "ux": [
-        "ui",
-        "интерфейс",
-        "пользователь",
-        "ux",
-        "форма",
-        "экран",
-        "frontend",
-    ],
-    "security": [
-        "auth",
-        "аутентификация",
-        "authorization",
-        "шифрование",
-        "gdpr",
-        "доступ",
-        "permission",
-        "login",
-    ],
-    "performance": [
-        "perf",
-        "нагрузка",
-        "кеш",
-        "latency",
-        "optimization",
-        "bottleneck",
-    ],
-}
-
 DEFAULT_CATEGORY = "decisions"
 
 
-def detect_category(line: str) -> str:
+def discover_categories(docs: Path) -> set[str]:
+    """Return folder names directly under docs/ as valid categories."""
+    if not docs.exists():
+        return set()
+    return {
+        d.name
+        for d in docs.iterdir()
+        if d.is_dir() and not d.name.startswith(".")
+    }
+
+
+def ensure_default_category(docs: Path, categories: set[str]) -> set[str]:
+    """Make sure the default category folder exists."""
+    (docs / DEFAULT_CATEGORY).mkdir(parents=True, exist_ok=True)
+    return categories | {DEFAULT_CATEGORY}
+
+
+def detect_category(line: str, categories: set[str]) -> str:
     # Explicit tag like [category] or [[category]].
     m = re.search(r"\[\[?([a-z0-9_]+)\]?\]?", line, re.I)
     if m:
         cat = m.group(1).lower()
-        if cat in CATEGORIES or cat == DEFAULT_CATEGORY:
+        if cat in categories:
             return cat
 
-    # Keyword fallback.
+    # Keyword fallback: match discovered category names, longest first.
     low = line.lower()
-    for cat, keywords in CATEGORIES.items():
-        for kw in keywords:
-            if kw in low:
-                return cat
+    for cat in sorted(categories, key=len, reverse=True):
+        if cat.lower() in low:
+            return cat
 
-    return DEFAULT_CATEGORY
+    if DEFAULT_CATEGORY in categories:
+        return DEFAULT_CATEGORY
+    return next(iter(categories))
 
 
 def strip_category_tag(line: str) -> str:
-    return re.sub(r"^[-*]?\s*\[\[?[a-z0-9_]+\]?\]?\s*", "", line, flags=re.I).strip()
+    line = re.sub(r"\[\[?[a-z0-9_]+\]?\]?\s*", "", line, count=1, flags=re.I)
+    line = re.sub(r"^[-*]\s*", "", line)
+    return line.strip()
 
 
 def load_socratic(path: Path) -> str:
@@ -121,7 +75,7 @@ def load_socratic(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def parse_entries(text: str) -> list[dict]:
+def parse_entries(text: str, categories: set[str]) -> list[dict]:
     entries = []
     # Split on H2 headings.
     parts = re.split(r"^(## .+)$", text, flags=re.M)
@@ -138,7 +92,7 @@ def parse_entries(text: str) -> list[dict]:
         categorized: dict[str, list[str]] = defaultdict(list)
         for line in body.splitlines():
             if line.startswith("- ") or line.startswith("* "):
-                cat = detect_category(line)
+                cat = detect_category(line, categories)
                 cleaned = strip_category_tag(line)
                 if cleaned:
                     categorized[cat].append(cleaned)
@@ -173,9 +127,12 @@ def write_index(docs: Path, category: str, entries: list[dict]) -> None:
 
 def main() -> int:
     root = Path.cwd()
-    socratic = root / "docs" / "socratic.md"
+    docs = root / "docs"
+    socratic = docs / "socratic.md"
     text = load_socratic(socratic)
-    entries = parse_entries(text)
+
+    categories = ensure_default_category(docs, discover_categories(docs))
+    entries = parse_entries(text, categories)
     if not entries:
         print("No tagged discoveries found in docs/socratic.md")
         return 0
@@ -184,7 +141,6 @@ def main() -> int:
     for entry in entries:
         grouped[entry["category"]].append(entry)
 
-    docs = root / "docs"
     for category, group in grouped.items():
         write_index(docs, category, group)
 

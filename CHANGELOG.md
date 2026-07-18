@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.5 — 2026-07-18
+
+### Changed
+- Category tags in `docs/socratic.md` are now derived from the existing `docs/<category>/` folder structure instead of a hardcoded list.
+- Updated `socratic-merge` to discover valid categories from `docs/` subdirectories and fall back to `docs/decisions/`.
+
 ## 1.3.3 — 2026-07-18
 
 ### Changed
