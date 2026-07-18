@@ -1,0 +1,199 @@
+#!/usr/bin/env python3
+"""
+socratic-merge reads docs/soratic.md and distributes tagged discoveries
+into docs/<category>/index.md files in the current repository.
+
+Expected soratic.md format:
+
+## <Topic>
+
+### <YYYY-MM-DD HH:MM>
+
+- [architecture] Some discovery about architecture.
+- [api] Some discovery about API.
+"""
+
+from __future__ import annotations
+
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+
+CATEGORIES = {
+    "architecture": [
+        "архитектура",
+        "компонент",
+        "стек",
+        "data flow",
+        "микросервис",
+        "монолит",
+        "service",
+        "module",
+    ],
+    "api": [
+        "api",
+        "endpoint",
+        "контракт",
+        "интеграция",
+        "webhook",
+        "rest",
+        "graphql",
+    ],
+    "data": [
+        "база данных",
+        "модель данных",
+        "миграция",
+        "хранение",
+        "backup",
+        "state",
+        "schema",
+    ],
+    "deployment": [
+        "deploy",
+        "infra",
+        "инфраструктура",
+        "ci/cd",
+        "docker",
+        "kubernetes",
+        "hosting",
+        "server",
+    ],
+    "ux": [
+        "ui",
+        "интерфейс",
+        "пользователь",
+        "ux",
+        "форма",
+        "экран",
+        "frontend",
+    ],
+    "security": [
+        "auth",
+        "аутентификация",
+        "authorization",
+        "шифрование",
+        "gdpr",
+        "доступ",
+        "permission",
+        "login",
+    ],
+    "performance": [
+        "perf",
+        "нагрузка",
+        "кеш",
+        "latency",
+        "optimization",
+        "bottleneck",
+    ],
+}
+
+DEFAULT_CATEGORY = "decisions"
+
+
+def detect_category(line: str) -> str:
+    # Explicit tag like [category] or [[category]].
+    m = re.search(r"\[\[?([a-z0-9_]+)\]?\]?", line, re.I)
+    if m:
+        cat = m.group(1).lower()
+        if cat in CATEGORIES or cat == DEFAULT_CATEGORY:
+            return cat
+
+    # Keyword fallback.
+    low = line.lower()
+    for cat, keywords in CATEGORIES.items():
+        for kw in keywords:
+            if kw in low:
+                return cat
+
+    return DEFAULT_CATEGORY
+
+
+def strip_category_tag(line: str) -> str:
+    return re.sub(r"^[-*]?\s*\[\[?[a-z0-9_]+\]?\]?\s*", "", line, flags=re.I).strip()
+
+
+def load_soratic(path: Path) -> str:
+    if not path.exists():
+        print(f"Missing {path}", file=sys.stderr)
+        sys.exit(1)
+    return path.read_text(encoding="utf-8")
+
+
+def parse_entries(text: str) -> list[dict]:
+    entries = []
+    # Split on H2 headings.
+    parts = re.split(r"^(## .+)$", text, flags=re.M)
+    if len(parts) < 3:
+        return entries
+
+    for i in range(1, len(parts), 2):
+        heading = parts[i].strip()
+        body = parts[i + 1] if i + 1 < len(parts) else ""
+        topic = heading.lstrip("# ").strip()
+        dt_match = re.search(r"^### (.+)$", body, re.M)
+        dt = dt_match.group(1).strip() if dt_match else ""
+
+        categorized: dict[str, list[str]] = defaultdict(list)
+        for line in body.splitlines():
+            if line.startswith("- ") or line.startswith("* "):
+                cat = detect_category(line)
+                cleaned = strip_category_tag(line)
+                if cleaned:
+                    categorized[cat].append(cleaned)
+
+        for cat, bullets in categorized.items():
+            entries.append(
+                {
+                    "topic": topic,
+                    "dt": dt,
+                    "category": cat,
+                    "bullets": bullets,
+                }
+            )
+
+    return entries
+
+
+def write_index(docs: Path, category: str, entries: list[dict]) -> None:
+    folder = docs / category
+    folder.mkdir(parents=True, exist_ok=True)
+    index = folder / "index.md"
+
+    with index.open("a", encoding="utf-8") as f:
+        for entry in entries:
+            f.write(f"## {entry['topic']}\n\n")
+            if entry["dt"]:
+                f.write(f"*{entry['dt']}*\n\n")
+            for bullet in entry["bullets"]:
+                f.write(f"- {bullet}\n")
+            f.write("\n")
+
+
+def main() -> int:
+    root = Path.cwd()
+    soratic = root / "docs" / "soratic.md"
+    text = load_soratic(soratic)
+    entries = parse_entries(text)
+    if not entries:
+        print("No tagged discoveries found in docs/soratic.md")
+        return 0
+
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    for entry in entries:
+        grouped[entry["category"]].append(entry)
+
+    docs = root / "docs"
+    for category, group in grouped.items():
+        write_index(docs, category, group)
+
+    categories = ", ".join(sorted(grouped.keys()))
+    print(
+        f"Merged {len(entries)} tagged block(s) into {len(grouped)} category index file(s): {categories}"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
