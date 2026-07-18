@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-socratic-merge reads docs/soratic.md and distributes tagged discoveries
+socratic-merge reads docs/socratic.md and distributes tagged discoveries
 into docs/<category>/index.md files in the current repository.
 
-Expected soratic.md format:
+Expected socratic.md format:
 
 ## <Topic>
 
@@ -114,7 +114,7 @@ def strip_category_tag(line: str) -> str:
     return re.sub(r"^[-*]?\s*\[\[?[a-z0-9_]+\]?\]?\s*", "", line, flags=re.I).strip()
 
 
-def load_soratic(path: Path) -> str:
+def load_socratic(path: Path) -> str:
     if not path.exists():
         print(f"Missing {path}", file=sys.stderr)
         sys.exit(1)
@@ -173,11 +173,11 @@ def write_index(docs: Path, category: str, entries: list[dict]) -> None:
 
 def main() -> int:
     root = Path.cwd()
-    soratic = root / "docs" / "soratic.md"
-    text = load_soratic(soratic)
+    socratic = root / "docs" / "socratic.md"
+    text = load_socratic(socratic)
     entries = parse_entries(text)
     if not entries:
-        print("No tagged discoveries found in docs/soratic.md")
+        print("No tagged discoveries found in docs/socratic.md")
         return 0
 
     grouped: dict[str, list[dict]] = defaultdict(list)

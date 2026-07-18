@@ -4,7 +4,7 @@
 
 ### Added
 - Invocation parameter `string` for the initial request description.
-- `docs/soratic.md` artifact format: H2 topic + H3 datetime.
+- `docs/socratic.md` artifact format: H2 topic + H3 datetime.
 - `socratic-merge` CLI command and Python helper that distributes tagged discoveries into `docs/<category>/index.md`.
 
 ## 1.2.0 — 2026-07-18

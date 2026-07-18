@@ -11,13 +11,13 @@ ln -sf /home/tdsd/agent_skills/socratic/socratic-merge ~/.local/bin/socratic-mer
 
 ## Usage
 
-Invoke the skill with a `string` parameter describing the initial request. During the dialogue the agent writes key discoveries to `docs/soratic.md`. After the dialogue run:
+Invoke the skill with a `string` parameter describing the initial request. During the dialogue the agent writes key discoveries to `docs/socratic.md`. After the dialogue run:
 
 ```bash
 socratic-merge
 ```
 
-This distributes tagged entries from `docs/soratic.md` into `docs/<category>/index.md`.
+This distributes tagged entries from `docs/socratic.md` into `docs/<category>/index.md`.
 
 ## Files
 
