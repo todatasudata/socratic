@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2 — 2026-07-18
+
+### Changed
+- Refactored `SKILL.md` with write-cut principles: removed fillers, tightened prose, converted explanations to lists, kept active voice.
+- Updated `README.md` install instructions to cover local path and GitHub install via `skillport add`.
+
 ## 1.3.1 — 2026-07-18
 
 ### Changed
