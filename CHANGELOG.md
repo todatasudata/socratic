@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 — 2026-07-18
+
+### Changed
+- Updated architect persona: from harsh to wise and slightly ironic.
+- Replaced conflict-themed example with a creativity/cooperation example (collaborative interactive fiction platform).
+- Added rules for respecting intent and handling blind spots gently.
+
 ## 1.1.0 — 2026-07-18
 
 ### Changed
