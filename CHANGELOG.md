@@ -1,10 +1,5 @@
 # Changelog
 
-## 1.3.4 — 2026-07-18
-
-### Changed
-- Renamed skill identifier from `socratic` to `socratic-me` everywhere: frontmatter, README, local directory, remote URL.
-
 ## 1.3.3 — 2026-07-18
 
 ### Changed

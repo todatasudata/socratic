@@ -1,4 +1,4 @@
-# socratic-me
+# Socratic Architect
 
 Agent skill for turning vague ideas into structured technical specs through Socratic dialogue.
 
@@ -7,13 +7,13 @@ Agent skill for turning vague ideas into structured technical specs through Socr
 For all agents:
 
 ```bash
-npx skills add todatasudata/socratic-me --global --yes
+npx skills add todatasudata/socratic --global --yes
 ```
 
 Then symlink the merge helper into `~/.local/bin` (already in `PATH`):
 
 ```bash
-ln -sf ~/.agents/skills/socratic-me/socratic-merge ~/.local/bin/socratic-merge
+ln -sf ~/.agents/skills/socratic/socratic-merge ~/.local/bin/socratic-merge
 ```
 
 ## Usage
