@@ -1,5 +1,5 @@
 ---
-name: socratic_architect
+name: socratic
 description: Проектирует архитектуру, скрипт или сервис через сократовский диалог. Превращает размытые хотелки в четкое инженерное ТЗ.
 metadata:
   skillport:

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 — 2026-07-18
+
+### Changed
+- Renamed frontmatter `name` from `socratic_architect` to `socratic` to match directory and satisfy `skillport` naming rules.
+- Simplified install: use `skillport add /home/tdsd/agent_skills/socratic --yes`.
+
 ## 1.3.0 — 2026-07-18
 
 ### Added

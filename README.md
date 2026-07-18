@@ -5,7 +5,7 @@ Agent skill for turning vague ideas into structured technical specs through Socr
 ## Install
 
 ```bash
-ln -s /home/tdsd/agent_skills/socratic ~/.skillport/skills/socratic
+skillport add /home/tdsd/agent_skills/socratic --yes
 ln -sf /home/tdsd/agent_skills/socratic/socratic-merge ~/.local/bin/socratic-merge
 ```
 
