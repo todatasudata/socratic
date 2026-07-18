@@ -17,3 +17,12 @@ Thumbs.db
 # Misc
 node_modules/
 __pycache__/
+
+# Agent-generated directories
+.agents/
+.claude/
+.cursor/
+.windsurf/
+
+# Skill manager lock files
+skills-lock.json

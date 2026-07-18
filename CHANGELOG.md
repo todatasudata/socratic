@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.3 — 2026-07-18
+
+### Changed
+- Switched install instructions to `npx skills add todatasudata/socratic --global --yes`.
+- Updated `.gitignore` to ignore agent-generated directories (`.agents/`, `.claude/`, `.cursor/`, `.windsurf/`) and `skills-lock.json`.
+
 ## 1.3.2 — 2026-07-18
 
 ### Changed

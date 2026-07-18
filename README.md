@@ -4,22 +4,16 @@ Agent skill for turning vague ideas into structured technical specs through Socr
 
 ## Install
 
-Local path:
+For all agents:
 
 ```bash
-skillport add /home/tdsd/agent_skills/socratic --yes
+npx skills add todatasudata/socratic --global --yes
 ```
 
-From GitHub:
+Then symlink the merge helper into `~/.local/bin` (already in `PATH`):
 
 ```bash
-skillport add https://github.com/todatasudata/socratic --yes
-```
-
-Then symlink the helper into `~/.local/bin` (already in `PATH`):
-
-```bash
-ln -sf ~/.skillport/skills/socratic/socratic-merge ~/.local/bin/socratic-merge
+ln -sf ~/.agents/skills/socratic/socratic-merge ~/.local/bin/socratic-merge
 ```
 
 ## Usage
