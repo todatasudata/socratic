@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.6 — 2026-07-18
+
+### Changed
+- Added explicit focus on detecting contradictions and asking clarifying questions until they resolve.
+- Added rule to proactively ask about external constraints: deadlines, budget, compliance, access rights, legacy systems, SLA, team skills, and regulatory requirements.
+
 ## 1.3.5 — 2026-07-18
 
 ### Changed
